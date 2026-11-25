@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://bjuwkfl87ylvm"]
 
+[ext_resource type="Script" uid="uid://bqbx6ruje31su" path="res://scripts/player.gd" id="1_3vyb7"]
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_r8uib"]
 radius = 0.35
 height = 1.8
@@ -9,6 +11,7 @@ radius = 0.35
 height = 1.8
 
 [node name="Player" type="CharacterBody3D" unique_id=294265613]
+script = ExtResource("1_3vyb7")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1998782655]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
