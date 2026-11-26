@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon.gd" id="1"]
+[ext_resource type="PackedScene" path="res://3dModels/smg/smg.glb" id="2"]
+
+[node name="SMG" type="Node3D"]
+script = ExtResource("1")
+weapon_name = "SMG"
+damage = 7.0
+fire_rate = 20.0
+weapon_range = 80.0
+can_shoot = true
+is_auto = true
+magazine_size = 30
+pellets = 1
+bullet_speed = 100.0
+bullet_scale = 0.8
+reload_time = 1.5
+
+[node name="Model" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0, 0.2)

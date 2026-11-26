@@ -1,0 +1,356 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/weapon_pickup.tscn" id="2_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/pump_shotgun.tscn" id="3_shotgun"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/ar.tscn" id="4_ar"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/smg.tscn" id="5_smg"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/sniper.tscn" id="6_sniper"]
+[ext_resource type="PackedScene" path="res://3dModels/pickaxe.glb" id="7_pickaxe"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/minis.tscn" id="8_minis"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="9_hud"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.2, 0.42, 0.9, 1)
+sky_horizon_color = Color(0.75, 0.87, 1, 1)
+ground_bottom_color = Color(0.1, 0.2, 0.1, 1)
+ground_horizon_color = Color(0.6, 0.75, 0.6, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+tonemap_mode = 4
+fog_enabled = true
+fog_light_color = Color(0.85, 0.92, 1, 1)
+fog_density = 0.0025
+
+[sub_resource type="StyleBoxFlat" id="sb_bar_bg"]
+bg_color = Color(0.05, 0.05, 0.05, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="sb_shield"]
+bg_color = Color(0.15, 0.45, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="sb_health"]
+bg_color = Color(0.15, 0.8, 0.25, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StandardMaterial3D" id="mat_ground"]
+albedo_color = Color(0.2, 0.7, 0.25, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(200, 1, 200)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(200, 1, 200)
+
+[sub_resource type="StandardMaterial3D" id="mat_wall"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall"]
+size = Vector3(202, 200, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall"]
+size = Vector3(202, 200, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_side"]
+size = Vector3(1, 200, 202)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_side"]
+size = Vector3(1, 200, 202)
+
+[sub_resource type="BoxMesh" id="BoxMesh_roof"]
+size = Vector3(202, 1, 202)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_roof"]
+size = Vector3(202, 1, 202)
+
+[node name="Practice" type="Node3D"]
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, -0.3213938, 0.3830222, 0, 0.7660444, 0.6427876, -0.5, -0.5566704, 0.6634139, 0, 30, 0)
+light_energy = 1.2
+shadow_enabled = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+material_override = SubResource("mat_ground")
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_ground")
+
+[node name="WallNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, -100)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallNorth"]
+material_override = SubResource("mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallNorth"]
+shape = SubResource("BoxShape3D_wall")
+
+[node name="WallSouth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 100)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallSouth"]
+material_override = SubResource("mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallSouth"]
+shape = SubResource("BoxShape3D_wall")
+
+[node name="WallEast" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 100, 100, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallEast"]
+material_override = SubResource("mat_wall")
+mesh = SubResource("BoxMesh_wall_side")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallEast"]
+shape = SubResource("BoxShape3D_wall_side")
+
+[node name="WallWest" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -100, 100, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallWest"]
+material_override = SubResource("mat_wall")
+mesh = SubResource("BoxMesh_wall_side")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallWest"]
+shape = SubResource("BoxShape3D_wall_side")
+
+[node name="Roof" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 200, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Roof"]
+material_override = SubResource("mat_wall")
+mesh = SubResource("BoxMesh_roof")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Roof"]
+shape = SubResource("BoxShape3D_roof")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90, -0.05, 0)
+
+[node name="ShotgunPickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -20)
+weapon = ExtResource("3_shotgun")
+
+[node name="ARPickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -12)
+weapon = ExtResource("4_ar")
+
+[node name="SMGPickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -4)
+weapon = ExtResource("5_smg")
+
+[node name="SniperPickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 4)
+weapon = ExtResource("6_sniper")
+
+[node name="PickaxePickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 12)
+weapon = ExtResource("7_pickaxe")
+
+[node name="MinisPickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 20)
+weapon = ExtResource("8_minis")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("9_hud")
+
+[node name="Hotbar" type="HBoxContainer" parent="HUD"]
+anchors_preset = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -390.0
+offset_top = -72.0
+offset_right = -24.0
+offset_bottom = -16.0
+theme_override_constants/separation = 6
+
+[node name="Slot0" type="PanelContainer" parent="HUD/Hotbar"]
+custom_minimum_size = Vector2(56, 56)
+
+[node name="Slot1" type="PanelContainer" parent="HUD/Hotbar"]
+custom_minimum_size = Vector2(56, 56)
+
+[node name="Slot2" type="PanelContainer" parent="HUD/Hotbar"]
+custom_minimum_size = Vector2(56, 56)
+
+[node name="Slot3" type="PanelContainer" parent="HUD/Hotbar"]
+custom_minimum_size = Vector2(56, 56)
+
+[node name="Slot4" type="PanelContainer" parent="HUD/Hotbar"]
+custom_minimum_size = Vector2(56, 56)
+
+[node name="Slot5" type="PanelContainer" parent="HUD/Hotbar"]
+custom_minimum_size = Vector2(56, 56)
+
+[node name="Bars" type="VBoxContainer" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -50.0
+offset_right = 256.0
+offset_bottom = -8.0
+theme_override_constants/separation = 6
+
+[node name="ShieldBar" type="ProgressBar" parent="HUD/Bars"]
+custom_minimum_size = Vector2(240, 16)
+max_value = 100.0
+value = 100.0
+show_percentage = false
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_shield")
+
+[node name="HealthBar" type="ProgressBar" parent="HUD/Bars"]
+custom_minimum_size = Vector2(240, 16)
+max_value = 100.0
+value = 100.0
+show_percentage = false
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_health")
+
+[node name="Crosshair" type="Control" parent="HUD"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HL" type="ColorRect" parent="HUD/Crosshair"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -11.0
+offset_top = -13.0
+offset_right = -4.0
+offset_bottom = -11.0
+color = Color(1, 1, 1, 0.9)
+
+[node name="HR" type="ColorRect" parent="HUD/Crosshair"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 4.0
+offset_top = -13.0
+offset_right = 11.0
+offset_bottom = -11.0
+color = Color(1, 1, 1, 0.9)
+
+[node name="VT" type="ColorRect" parent="HUD/Crosshair"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -1.0
+offset_top = -23.0
+offset_right = 1.0
+offset_bottom = -16.0
+color = Color(1, 1, 1, 0.9)
+
+[node name="VB" type="ColorRect" parent="HUD/Crosshair"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -1.0
+offset_top = -8.0
+offset_right = 1.0
+offset_bottom = -1.0
+color = Color(1, 1, 1, 0.9)
+
+[node name="ReloadLabel" type="Label" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -100.0
+offset_top = 24.0
+offset_right = 100.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="InventoryUI" type="Control" parent="HUD"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dim" type="ColorRect" parent="HUD/InventoryUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.5)
+
+[node name="InventoryPanel" type="PanelContainer" parent="HUD/InventoryUI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="HUD/InventoryUI/InventoryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Grid" type="GridContainer" parent="HUD/InventoryUI/InventoryPanel/Margin"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 5

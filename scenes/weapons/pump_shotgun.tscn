@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon.gd" id="1"]
+[ext_resource type="PackedScene" path="res://3dModels/pump/pumpshotgun.glb" id="2"]
+
+[node name="PumpShotgun" type="Node3D"]
+script = ExtResource("1")
+weapon_name = "Pump Shotgun"
+damage = 12.0
+fire_rate = 1.2
+weapon_range = 30.0
+can_shoot = true
+magazine_size = 8
+pellets = 1
+bullet_speed = 50.0
+bullet_scale = 3.0
+reload_time = 2.0
+
+[node name="Model" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0, 0.02)

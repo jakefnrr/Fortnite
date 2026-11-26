@@ -1,0 +1,245 @@
+[gd_scene load_steps=96 format=3]
+
+[ext_resource type="Script" uid="uid://bqbx6ruje31su" path="res://scripts/player.gd" id="1_3vyb7"]
+[ext_resource type="PackedScene" uid="uid://bajgovx87rwsn" path="res://3dModels/pickaxe.glb" id="2_g2els"]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/pump_shotgun.tscn" id="wpn"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_r8uib"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="mat_pants"]
+albedo_color = Color(0.32, 0.2, 0.1, 1)
+roughness = 0.75
+
+[sub_resource type="CapsuleMesh" id="leg_mesh"]
+radius = 0.09
+height = 0.75
+
+[sub_resource type="StandardMaterial3D" id="mat_boots"]
+albedo_color = Color(0.15, 0.1, 0.08, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="boot_mesh"]
+size = Vector3(0.15, 0.14, 0.26)
+
+[sub_resource type="StandardMaterial3D" id="mat_jacket"]
+albedo_color = Color(0.42, 0.48, 0.2, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="torso_mesh"]
+size = Vector3(0.5, 0.6, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="mat_skin"]
+albedo_color = Color(0.9, 0.68, 0.52, 1)
+roughness = 0.75
+
+[sub_resource type="CapsuleMesh" id="neck_mesh"]
+radius = 0.06
+height = 0.15
+
+[sub_resource type="StandardMaterial3D" id="mat_belt"]
+albedo_color = Color(0.2, 0.12, 0.07, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="belt_mesh"]
+size = Vector3(0.52, 0.09, 0.32)
+
+[sub_resource type="StandardMaterial3D" id="mat_gold"]
+albedo_color = Color(0.6, 0.45, 0.15, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="buckle_mesh"]
+size = Vector3(0.07, 0.07, 0.02)
+
+[sub_resource type="StandardMaterial3D" id="mat_strap"]
+albedo_color = Color(0.12, 0.08, 0.06, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="strap_mesh"]
+size = Vector3(0.07, 0.6977539, 0.02)
+
+[sub_resource type="SphereMesh" id="shoulder_mesh"]
+radius = 0.09
+height = 0.18
+radial_segments = 12
+rings = 8
+
+[sub_resource type="SphereMesh" id="head_mesh"]
+radius = 0.21
+height = 0.42
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="mat_hair"]
+albedo_color = Color(0.85, 0.68, 0.25, 1)
+roughness = 0.75
+
+[sub_resource type="SphereMesh" id="hair_mesh"]
+radius = 0.235
+height = 0.47
+radial_segments = 16
+rings = 8
+
+[sub_resource type="CapsuleMesh" id="upperarm_mesh"]
+radius = 0.07
+height = 0.3198828
+
+[sub_resource type="CapsuleMesh" id="forearm_mesh"]
+radius = 0.06
+height = 0.33
+
+[sub_resource type="SphereMesh" id="hand_mesh"]
+radius = 0.07
+height = 0.14
+radial_segments = 12
+rings = 8
+
+
+[node name="PumpShotgunHold" type="Node3D"]
+
+[node name="Player" type="CharacterBody3D" unique_id=294265613 parent="."]
+script = ExtResource("1_3vyb7")
+
+[node name="CameraPivot" type="Node3D" parent="Player" unique_id=881234567]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Player/CameraPivot" unique_id=772345678]
+spring_length = 6.0
+margin = 0.1
+
+[node name="Camera3D" type="Camera3D" parent="Player/CameraPivot/SpringArm3D" unique_id=663456789]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=783142631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_r8uib")
+
+[node name="Visual" type="Node3D" parent="Player" unique_id=900001]
+
+[node name="LegL" type="Node3D" parent="Player/Visual" unique_id=900002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.9, 0)
+
+[node name="Leg" type="MeshInstance3D" parent="Player/Visual/LegL" unique_id=900003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.42, 0)
+material_override = SubResource("mat_pants")
+mesh = SubResource("leg_mesh")
+
+[node name="Boot" type="MeshInstance3D" parent="Player/Visual/LegL" unique_id=900004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.83, -0.03)
+material_override = SubResource("mat_boots")
+mesh = SubResource("boot_mesh")
+
+[node name="LegR" type="Node3D" parent="Player/Visual" unique_id=900005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.9, 0)
+
+[node name="Leg" type="MeshInstance3D" parent="Player/Visual/LegR" unique_id=900006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.42, 0)
+material_override = SubResource("mat_pants")
+mesh = SubResource("leg_mesh")
+
+[node name="Boot" type="MeshInstance3D" parent="Player/Visual/LegR" unique_id=900007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.83, -0.03)
+material_override = SubResource("mat_boots")
+mesh = SubResource("boot_mesh")
+
+[node name="Torso" type="MeshInstance3D" parent="Player/Visual" unique_id=900008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+material_override = SubResource("mat_jacket")
+mesh = SubResource("torso_mesh")
+
+[node name="Neck" type="MeshInstance3D" parent="Player/Visual" unique_id=900009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
+material_override = SubResource("mat_skin")
+mesh = SubResource("neck_mesh")
+
+[node name="Belt" type="MeshInstance3D" parent="Player/Visual" unique_id=900010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+material_override = SubResource("mat_belt")
+mesh = SubResource("belt_mesh")
+
+[node name="Buckle" type="MeshInstance3D" parent="Player/Visual" unique_id=900011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -0.17)
+material_override = SubResource("mat_gold")
+mesh = SubResource("buckle_mesh")
+
+[node name="StrapL" type="MeshInstance3D" parent="Player/Visual" unique_id=900013]
+transform = Transform3D(0.76604444, -0.6427876, 0, 0.6427876, 0.76604444, 0, 0, 0, 1, 0.0010868385, 1.1603204, 0.16417423)
+material_override = SubResource("mat_strap")
+mesh = SubResource("strap_mesh")
+
+[node name="StrapR" type="MeshInstance3D" parent="Player/Visual" unique_id=900014]
+transform = Transform3D(0.76604444, 0.6427876, 0, -0.6427876, 0.76604444, 0, 0, 0, 1, -0.0030675158, 1.1571052, 0.16168043)
+material_override = SubResource("mat_strap")
+mesh = SubResource("strap_mesh")
+
+[node name="ShoulderL" type="MeshInstance3D" parent="Player/Visual" unique_id=900015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.27, 1.42, 0)
+material_override = SubResource("mat_jacket")
+mesh = SubResource("shoulder_mesh")
+
+[node name="ShoulderR" type="MeshInstance3D" parent="Player/Visual" unique_id=900016]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, 1.42, 0)
+material_override = SubResource("mat_jacket")
+mesh = SubResource("shoulder_mesh")
+
+[node name="Head" type="MeshInstance3D" parent="Player/Visual" unique_id=900017]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+material_override = SubResource("mat_skin")
+mesh = SubResource("head_mesh")
+
+[node name="Hair" type="MeshInstance3D" parent="Player/Visual" unique_id=900018]
+transform = Transform3D(1.05, 0, 0, 0, 0.8, 0, 0, 0, 1.05, 0, 1.77, 0.03)
+material_override = SubResource("mat_hair")
+mesh = SubResource("hair_mesh")
+
+[node name="ArmL" type="Node3D" parent="Player/Visual" unique_id=900019]
+transform = Transform3D(0.4536, 0.8529, -0.259, -0.8829, 0.4695, 0, 0.1216, 0.2287, 0.966, -0.3, 1.52, 0)
+
+[node name="UpperArm" type="MeshInstance3D" parent="Player/Visual/ArmL" unique_id=900020]
+transform = Transform3D(0.9396933, -0.08852135, -0.33036608, -1.1920929e-07, 0.9659259, -0.25881892, 0.3420202, 0.24321029, 0.9076733, 0.08144081, -0.17188793, -0.012922354)
+material_override = SubResource("mat_jacket")
+mesh = SubResource("upperarm_mesh")
+
+[node name="Elbow" type="Node3D" parent="Player/Visual/ArmL" unique_id=900021]
+transform = Transform3D(1, 0, 0, 0, 0.9397, -0.342, 0, 0.342, 0.9397, 0, -0.3, -0.05)
+
+[node name="Forearm" type="MeshInstance3D" parent="Player/Visual/ArmL/Elbow" unique_id=900022]
+transform = Transform3D(0.70710653, -0.6644628, -0.24184485, -5.9604645e-08, 0.34201998, -0.93969274, 0.7071066, 0.66446286, 0.24184486, 0.1968522, -0.06404106, -0.13144794)
+material_override = SubResource("mat_jacket")
+mesh = SubResource("forearm_mesh")
+
+[node name="Hand" type="MeshInstance3D" parent="Player/Visual/ArmL/Elbow" unique_id=900023]
+transform = Transform3D(0.99999994, 5.9604645e-08, -6.7055225e-08, 0, 1, -1.7881393e-07, -8.195639e-08, -2.0861626e-07, 0.9999999, 0.30956948, -0.10921392, -0.30587488)
+material_override = SubResource("mat_skin")
+mesh = SubResource("hand_mesh")
+
+[node name="ArmR" type="Node3D" parent="Player/Visual" unique_id=900024]
+transform = Transform3D(0.4536, -0.8539, 0.259, 0.8829, 0.4695, 0, -0.1216, 0.2297, 0.966, 0.3, 1.52, 0)
+
+[node name="UpperArm" type="MeshInstance3D" parent="Player/Visual/ArmR" unique_id=900025]
+transform = Transform3D(0.99999994, 7.450581e-09, 0, -1.3038516e-08, 0.9659258, -0.25881904, 0, 0.25881904, 0.96592575, -0.083470225, -0.18341362, -0.02231963)
+material_override = SubResource("mat_jacket")
+mesh = SubResource("upperarm_mesh")
+
+[node name="Elbow" type="Node3D" parent="Player/Visual/ArmR" unique_id=900026]
+transform = Transform3D(1, 0, 0, 0, 0.9397, -0.342, 0, 0.342, 0.9397, 0, -0.3, -0.05)
+
+[node name="Forearm" type="MeshInstance3D" parent="Player/Visual/ArmR/Elbow" unique_id=900027]
+transform = Transform3D(0.87390673, -0.33359715, 0.35355335, 0.17101006, -0.46984634, -0.86602545, 0.45501927, 0.8172868, -0.35355335, 0.0064908266, 0.028184682, -0.13011235)
+material_override = SubResource("mat_jacket")
+mesh = SubResource("forearm_mesh")
+
+[node name="Hand" type="MeshInstance3D" parent="Player/Visual/ArmR/Elbow" unique_id=900028]
+transform = Transform3D(0.9999998, 0, -1.4901161e-08, 4.4703484e-08, 1, -2.9802322e-08, 7.4505806e-08, -2.9802322e-08, 1, 0.08170104, 0.115198374, -0.31104553)
+material_override = SubResource("mat_skin")
+mesh = SubResource("hand_mesh")
+
+[node name="WeaponPivot" type="Node3D" parent="Player/Visual/ArmR" unique_id=900029]
+transform = Transform3D(0.4536, 0.8829, -0.1216, -0.8529, 0.4695, 0.2287, 0.259, 0, 0.966, 0, -0.56, -0.34)
+
+[node name="Pickaxe" parent="Player/Visual/ArmR/WeaponPivot" unique_id=164626318 instance=ExtResource("2_g2els")]
+transform = Transform3D(-1.2239187e-07, 2.8, -4.656612e-10, -2.7999995, -1.2239188e-07, 4.656613e-10, 4.6566126e-10, 4.6566134e-10, 2.7999995, -0.54989386, 0.17554605, 0.030103445)
+
+[node name="PumpShotgun" parent="Player/Visual/ArmR/WeaponPivot" instance=ExtResource("wpn")]
+transform = Transform3D(0, -1.2, 0, 1.2, 0, 0, 0, 0, 1.2, -0.55, 0.18, 0.03)
