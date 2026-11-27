@@ -20,7 +20,7 @@ func _ready() -> void:
 	_reload_label = $ReloadLabel
 
 	for i in 6:
-		var slot := $Hotbar.get_node("Slot%d" % (5 - i))
+		var slot := $Hotbar.get_node("Slot%d" % i)
 		var tr := _make_icon_rect()
 		slot.add_child(tr)
 		_hotbar_icons.append(tr)
@@ -36,6 +36,7 @@ func _ready() -> void:
 		var tr := _make_icon_rect()
 		s.add_child(tr)
 		_inv_icons.append(tr)
+	$InventoryUI/Dim.gui_input.connect(_on_dim_input)
 
 
 func _make_icon_rect() -> TextureRect:
@@ -59,7 +60,7 @@ func _process(_delta: float) -> void:
 	var sig := ""
 	for i in 6:
 		var e = _player.weapon_entry_at(i)
-		var slot := $Hotbar.get_node("Slot%d" % (5 - i))
+		var slot := $Hotbar.get_node("Slot%d" % i)
 		slot.self_modulate = Color(1, 1, 0.4) if i == _player.current_slot else Color.WHITE
 		sig += str(e["name"]) if e != null else "-"
 		if e == null:
@@ -130,6 +131,11 @@ func _icon_viewport(scene: PackedScene) -> SubViewport:
 func _on_slot_input(event: InputEvent, slot_index: int) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		_player.equip_slot(slot_index)
+
+
+func _on_dim_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_set_open(false)
 
 
 func _set_open(open: bool) -> void:

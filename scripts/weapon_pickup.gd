@@ -36,9 +36,15 @@ func _process(delta: float) -> void:
 	var can_take := false
 	if _player and is_instance_valid(_player) and weapon:
 		var dist := global_position.distance_to(_player.global_position + Vector3(0, 1.0, 0))
-		if dist < PICKUP_RANGE:
-			can_take = true
-			if Input.is_action_just_pressed("interact"):
+		var cam := _player.get_viewport().get_camera_3d()
+		if dist < PICKUP_RANGE and cam:
+			var to := global_position - cam.global_position
+			var flat_to := Vector3(to.x, 0, to.z)
+			var fwd := -cam.global_transform.basis.z
+			var flat_fwd := Vector3(fwd.x, 0, fwd.z)
+			if flat_to.length() > 0.01 and flat_fwd.length() > 0.01:
+				can_take = flat_fwd.normalized().dot(flat_to.normalized()) > 0.2
+			if can_take and Input.is_action_just_pressed("interact"):
 				_take()
 	if _prompt:
 		_prompt.visible = can_take

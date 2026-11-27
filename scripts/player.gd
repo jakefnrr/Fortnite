@@ -12,6 +12,16 @@ const TURN_SPEED := 8.0
 
 const PICKAXE := preload("res://3dModels/pickaxe.glb")
 const BULLET := preload("res://scenes/bullet.tscn")
+const PICKUP_SCENE := preload("res://scenes/weapon_pickup.tscn")
+const BLUEPRINT := preload("res://scenes/build/blueprint.tscn")
+const GRID := 6.0
+const BUILD_PIECES := {
+	"wall": {"s": preload("res://scenes/build/wall.tscn"), "h": 4.8, "floor_only": false, "gy": 0.05},
+	"stair": {"s": preload("res://scenes/build/stair.tscn"), "h": 2.9, "floor_only": false, "gy": 0.35},
+	"cone": {"s": preload("res://scenes/build/cone.tscn"), "h": 1.4, "floor_only": false, "gy": 0.02},
+	"floor": {"s": preload("res://scenes/build/floor.tscn"), "h": 0.2, "floor_only": true, "gy": 0.05},
+}
+const BUILD_ORDER := ["wall", "stair", "cone", "floor"]
 const WEAPON_POS := Vector3(-0.55, 0.18, 0.03)
 const WEAPON_SCALE := 2.8
 
@@ -43,6 +53,19 @@ var _trigger := false
 var _fire_timer := 0.0
 var _reload_timer := 0.0
 var _ads := false
+var _using_item := false
+var _use_timer := 0.0
+var _use_item_name := ""
+var _build_mode := false
+var _build_piece := "wall"
+var _ghost: Node3D
+var _ghost_mat: StandardMaterial3D
+var _ghost_bad_mat: StandardMaterial3D
+var _ghost_meshes: Array = []
+var _ghost_cell := Vector2i.ZERO
+var _ghost_ok := false
+var _cells := {}
+var _prev_weapon: PackedScene
 
 
 func _ready() -> void:
@@ -52,6 +75,13 @@ func _ready() -> void:
 	_cam.h_offset = 0.8
 	_cam.v_offset = 0.15
 	arm.spring_length = 3.5
+	_ghost_mat = StandardMaterial3D.new()
+	_ghost_mat.albedo_color = Color(0.2, 0.5, 1, 0.35)
+	_ghost_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_ghost_bad_mat = StandardMaterial3D.new()
+	_ghost_bad_mat.albedo_color = Color(1, 0.15, 0.1, 0.35)
+	_ghost_bad_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	floor_max_angle = deg_to_rad(55.0)
 	equip_weapon(current_weapon)
 
 
@@ -82,8 +112,127 @@ func move_slot(a: int, b: int) -> void:
 
 func equip_slot(i: int) -> void:
 	var e = owned[i]
-	if e != null:
-		equip_weapon(e["scene"])
+	equip_weapon(e["scene"] if e != null else PICKAXE)
+
+
+func drop_weapon(i: int) -> void:
+	var e = owned[i]
+	if e == null or is_undroppable(e["scene"]):
+		return
+	owned[i] = null
+	var drop: Node3D = PICKUP_SCENE.instantiate()
+	drop.weapon = e["scene"]
+	get_tree().current_scene.add_child(drop)
+	var fwd := -global_transform.basis.z
+	drop.global_position = global_position + fwd * 2.0 + Vector3(0, 0.5, 0)
+	if current_weapon == e["scene"]:
+		equip_weapon(PICKAXE)
+
+
+func _set_build_mode(on: bool) -> void:
+	if on == _build_mode:
+		return
+	_build_mode = on
+	if _ghost:
+		_ghost.queue_free()
+		_ghost = null
+	if on:
+		_prev_weapon = current_weapon
+		equip_weapon(BLUEPRINT)
+	_rebuild_ghost()
+	if not on and _prev_weapon:
+		equip_weapon(_prev_weapon)
+		_prev_weapon = null
+
+
+func _toggle_build() -> void:
+	_set_build_mode(not _build_mode)
+
+
+func _rebuild_ghost() -> void:
+	if _ghost:
+		_ghost.queue_free()
+		_ghost = null
+	if not _build_mode:
+		return
+	_ghost = BUILD_PIECES[_build_piece]["s"].instantiate()
+	_ghost_meshes.clear()
+	for body in [_ghost] + _ghost.find_children("*", "CollisionObject3D", true, false):
+		body.collision_layer = 0
+	for mi in _ghost.find_children("*", "MeshInstance3D", true, false):
+		mi.material_override = _ghost_mat
+		_ghost_meshes.append(mi)
+	get_tree().current_scene.add_child(_ghost)
+
+
+func _set_piece(p: String) -> void:
+	if not _build_mode or not BUILD_PIECES.has(p):
+		return
+	_build_piece = p
+	_rebuild_ghost()
+
+
+func _update_ghost() -> void:
+	if _ghost == null:
+		return
+	var cam := get_viewport().get_camera_3d()
+	if cam == null:
+		return
+	var from := cam.global_position
+	var q := PhysicsRayQueryParameters3D.create(from, from - cam.global_transform.basis.z * 8.0)
+	var hit := get_world_3d().direct_space_state.intersect_ray(q)
+	var info: Dictionary = BUILD_PIECES[_build_piece]
+	if hit.is_empty():
+		_ghost.visible = false
+		return
+	var n: Vector3 = hit["normal"]
+	if info["floor_only"] and n.y < 0.5:
+		_ghost.visible = false
+		return
+	var hp: Vector3 = hit["position"]
+	var cell := Vector2i(floori(hp.x / GRID), floori(hp.z / GRID))
+	var pos := Vector3(cell.x * GRID + GRID * 0.5, hp.y, cell.y * GRID + GRID * 0.5)
+	if n.y < 0.5:
+		pos.y = hp.y - float(info["h"]) * 0.5
+	else:
+		pos.y = hp.y + float(info["gy"])
+	var yaw := snappedf(cam_yaw, PI / 2.0)
+	_ghost.transform = Transform3D(Basis(Vector3.UP, yaw), pos)
+	_ghost_cell = cell
+	_ghost_ok = not _cells.has(cell)
+	var mat := _ghost_mat if _ghost_ok else _ghost_bad_mat
+	for mi in _ghost_meshes:
+		mi.material_override = mat
+	_ghost.visible = true
+
+
+func _place_piece() -> void:
+	if _ghost == null or not _ghost.visible or not _ghost_ok:
+		return
+	var p: Node3D = BUILD_PIECES[_build_piece]["s"].instantiate()
+	p.transform = _ghost.transform
+	get_tree().current_scene.add_child(p)
+	_cells[_ghost_cell] = true
+
+
+func _on_key(k: int) -> void:
+	match k:
+		KEY_B:
+			_toggle_build()
+		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5:
+			_set_build_mode(false)
+			equip_slot(k - KEY_1 + 1)
+		KEY_6:
+			_set_build_mode(false)
+			equip_slot(0)
+		KEY_C:
+			_set_piece("wall")
+		KEY_V:
+			_set_piece("stair")
+		KEY_Z:
+			_set_piece("cone")
+		KEY_X:
+			_set_piece("floor")
 
 
 func equip_weapon(scene: PackedScene) -> void:
@@ -158,7 +307,40 @@ func _start_reload() -> void:
 	_reload_timer = float(_gun_stat("reload_time", 1.5))
 
 
+func _can_use_item() -> bool:
+	if _weapon_model == null or _using_item or reloading:
+		return false
+	var t: Variant = _weapon_model.get("use_time")
+	return t != null and float(t) > 0.0
+
+
+func _start_use() -> void:
+	var t := float(_weapon_model.get("use_time"))
+	if _weapon_model.get("time_scales_with_missing") == true:
+		var missing := 100.0 - health
+		t = 2.0 if missing <= 25.0 else (5.0 if missing <= 50.0 else 8.0)
+	_using_item = true
+	_use_timer = t
+	_use_item_name = str(_weapon_model.get("weapon_name") or "Item")
+
+
+func _finish_use() -> void:
+	_using_item = false
+	if _weapon_model == null:
+		return
+	if _weapon_model.get("heal_health") == true:
+		health = 100.0
+	var amt := float(_weapon_model.get("heal_shield") or 0.0)
+	if amt > 0.0:
+		shield = minf(shield + amt, float(_weapon_model.get("shield_cap") or 100.0))
+
+
 func reload_hint() -> String:
+	if _using_item:
+		return "Using %s... %.1fs" % [_use_item_name, _use_timer]
+	if _build_mode:
+		var names := {"wall": "Wall [C]", "stair": "Stair [V]", "cone": "Cone [Z]", "floor": "Floor [X]"}
+		return "BUILD MODE - %s  (B to exit)" % names[_build_piece]
 	if reloading:
 		return "Reloading..."
 	if _can_shoot() and ammo <= 0:
@@ -222,6 +404,12 @@ func _process(delta: float) -> void:
 		if _reload_timer <= 0.0:
 			ammo = int(_gun_stat("magazine_size", 0))
 			reloading = false
+	if _build_mode:
+		_update_ghost()
+	if _using_item:
+		_use_timer -= delta
+		if _use_timer <= 0.0:
+			_finish_use()
 	if _trigger and _can_shoot() and ammo > 0 and not reloading:
 		_fire_timer -= delta
 		if _fire_timer <= 0.0:
@@ -230,13 +418,21 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		_on_key(event.keycode)
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		cam_yaw -= event.relative.x * MOUSE_SENS
 		arm.rotation.x = clampf(arm.rotation.x - event.relative.y * MOUSE_SENS, PITCH_MIN, PITCH_MAX)
 	elif event is InputEventMouseButton:
 		if event.pressed:
 			if event.button_index == MOUSE_BUTTON_LEFT and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-				if _can_shoot():
+				if _build_mode:
+					_place_piece()
+				elif _using_item:
+					_using_item = false
+				elif _can_use_item():
+					_start_use()
+				elif _can_shoot():
 					_trigger = true
 					_fire_timer = 0.0
 				else:
@@ -273,7 +469,7 @@ func _physics_process(delta: float) -> void:
 	if absf(diff) > TURN_THRESHOLD:
 		rotation.y += clampf(diff, -TURN_SPEED * delta, TURN_SPEED * delta)
 
-	var input_dir := Input.get_vector("left", "right", "foward", "backward")
+	var input_dir := Vector2.ZERO if _using_item else Input.get_vector("left", "right", "foward", "backward")
 	var direction := (Basis(Vector3.UP, cam_yaw) * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	var speed := SPEED * (SPRINT_MULT if Input.is_key_pressed(KEY_SHIFT) else 1.0)
 	var target := direction * speed

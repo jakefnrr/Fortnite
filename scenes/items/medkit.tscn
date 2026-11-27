@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/item.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="box"]
+size = Vector3(0.5, 0.35, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="white"]
+albedo_color = Color(0.92, 0.92, 0.92, 1)
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="cross_h"]
+size = Vector3(0.3, 0.04, 0.09)
+
+[sub_resource type="BoxMesh" id="cross_v"]
+size = Vector3(0.09, 0.04, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="red"]
+albedo_color = Color(0.85, 0.1, 0.1, 1)
+roughness = 0.5
+
+[node name="MedKit" type="Node3D"]
+script = ExtResource("1")
+weapon_name = "Med Kit"
+use_time = 2.0
+heal_health = true
+time_scales_with_missing = true
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("box")
+material_override = SubResource("white")
+
+[node name="CrossH" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
+mesh = SubResource("cross_h")
+material_override = SubResource("red")
+
+[node name="CrossV" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
+mesh = SubResource("cross_v")
+material_override = SubResource("red")

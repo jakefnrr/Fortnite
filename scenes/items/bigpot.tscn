@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/item.gd" id="1"]
+
+[sub_resource type="CylinderMesh" id="pot"]
+top_radius = 0.22
+bottom_radius = 0.18
+height = 0.4
+
+[sub_resource type="StandardMaterial3D" id="orange"]
+albedo_color = Color(0.95, 0.55, 0.1, 1)
+roughness = 0.5
+
+[sub_resource type="CylinderMesh" id="lid"]
+top_radius = 0.24
+bottom_radius = 0.24
+height = 0.08
+
+[sub_resource type="StandardMaterial3D" id="lidmat"]
+albedo_color = Color(0.7, 0.35, 0.05, 1)
+roughness = 0.5
+
+[node name="BigPot" type="Node3D"]
+script = ExtResource("1")
+weapon_name = "Big Pot"
+use_time = 3.0
+heal_shield = 50.0
+shield_cap = 100.0
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("pot")
+material_override = SubResource("orange")
+
+[node name="Lid" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.44, 0)
+mesh = SubResource("lid")
+material_override = SubResource("lidmat")

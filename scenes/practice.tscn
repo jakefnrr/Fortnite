@@ -9,6 +9,8 @@
 [ext_resource type="PackedScene" path="res://3dModels/pickaxe.glb" id="7_pickaxe"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/minis.tscn" id="8_minis"]
 [ext_resource type="Script" path="res://scripts/hud.gd" id="9_hud"]
+[ext_resource type="PackedScene" path="res://scenes/items/medkit.tscn" id="10_medkit"]
+[ext_resource type="PackedScene" path="res://scenes/items/bigpot.tscn" id="11_bigpot"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.2, 0.42, 0.9, 1)
@@ -63,16 +65,16 @@ albedo_color = Color(0.5, 0.5, 0.5, 1)
 roughness = 0.7
 
 [sub_resource type="BoxMesh" id="BoxMesh_wall"]
-size = Vector3(202, 200, 1)
+size = Vector3(202, 210, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wall"]
-size = Vector3(202, 200, 1)
+size = Vector3(202, 210, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_wall_side"]
-size = Vector3(1, 200, 202)
+size = Vector3(1, 210, 202)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wall_side"]
-size = Vector3(1, 200, 202)
+size = Vector3(1, 210, 202)
 
 [sub_resource type="BoxMesh" id="BoxMesh_roof"]
 size = Vector3(202, 1, 202)
@@ -176,6 +178,14 @@ weapon = ExtResource("7_pickaxe")
 [node name="MinisPickup" parent="." instance=ExtResource("2_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 20)
 weapon = ExtResource("8_minis")
+
+[node name="MedkitPickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 28)
+weapon = ExtResource("10_medkit")
+
+[node name="BigPotPickup" parent="." instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 36)
+weapon = ExtResource("11_bigpot")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("9_hud")

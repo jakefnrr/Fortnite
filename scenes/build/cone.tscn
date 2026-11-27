@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[sub_resource type="CylinderMesh" id="mesh"]
+top_radius = 0.0
+bottom_radius = 2.9
+height = 1.4
+radial_segments = 4
+
+[sub_resource type="StandardMaterial3D" id="mat"]
+albedo_color = Color(0.2, 0.5, 0.9, 1)
+roughness = 0.7
+
+[sub_resource type="BoxShape3D" id="ramp_shape"]
+size = Vector3(5.4, 0.25, 2.2)
+
+[node name="Cone" type="StaticBody3D"]
+
+[node name="SideN" type="Node3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideN"]
+transform = Transform3D(1, 0, 0, 0, 0.8944, -0.4472, 0, 0.4472, 0.8944, 0, 0.65, -1.45)
+shape = SubResource("ramp_shape")
+
+[node name="SideS" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideS"]
+transform = Transform3D(1, 0, 0, 0, 0.8944, -0.4472, 0, 0.4472, 0.8944, 0, 0.65, -1.45)
+shape = SubResource("ramp_shape")
+
+[node name="SideE" type="Node3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideE"]
+transform = Transform3D(1, 0, 0, 0, 0.8944, -0.4472, 0, 0.4472, 0.8944, 0, 0.65, -1.45)
+shape = SubResource("ramp_shape")
+
+[node name="SideW" type="Node3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideW"]
+transform = Transform3D(1, 0, 0, 0, 0.8944, -0.4472, 0, 0.4472, 0.8944, 0, 0.65, -1.45)
+shape = SubResource("ramp_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("mat")
+mesh = SubResource("mesh")

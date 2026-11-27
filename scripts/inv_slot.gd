@@ -40,3 +40,9 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	player.move_slot(data["from"], slot_index)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_DRAG_END and not get_viewport().gui_is_drag_successful():
+		if not get_global_rect().has_point(get_global_mouse_position()):
+			player.drop_weapon(slot_index)

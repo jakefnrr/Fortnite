@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/weapon.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/item.gd" id="1"]
 
 [sub_resource type="BoxMesh" id="box"]
 size = Vector3(0.3, 0.3, 0.3)
@@ -12,9 +12,9 @@ roughness = 0.6
 [node name="Minis" type="Node3D"]
 script = ExtResource("1")
 weapon_name = "Minis"
-damage = 5.0
-fire_rate = 2.0
-weapon_range = 15.0
+use_time = 1.0
+heal_shield = 25.0
+shield_cap = 50.0
 
 [node name="Block" type="MeshInstance3D" parent="."]
 mesh = SubResource("box")
