@@ -3,7 +3,8 @@ extends CharacterBody3D
 const SPEED := 8.0
 const SPRINT_MULT := 1.5
 const ACCEL := 40.0
-const JUMP_VELOCITY := 5.5
+const JUMP_VELOCITY := 4.6
+const GRAVITY_MULT := 1.7
 const MOUSE_SENS := 0.003
 const PITCH_MIN := -1.2
 const PITCH_MAX := 1.2
@@ -16,7 +17,7 @@ const PICKUP_SCENE := preload("res://scenes/weapon_pickup.tscn")
 const BLUEPRINT := preload("res://scenes/build/blueprint.tscn")
 const GRID := 6.0
 const BUILD_PIECES := {
-	"wall": {"s": preload("res://scenes/build/wall.tscn"), "h": 4.8, "floor_only": false, "gy": 0.05},
+	"wall": {"s": preload("res://scenes/build/wall.tscn"), "h": 5.8, "floor_only": false, "gy": 0.05},
 	"stair": {"s": preload("res://scenes/build/stair.tscn"), "h": 2.9, "floor_only": false, "gy": 0.35},
 	"cone": {"s": preload("res://scenes/build/cone.tscn"), "h": 1.4, "floor_only": false, "gy": 0.02},
 	"floor": {"s": preload("res://scenes/build/floor.tscn"), "h": 0.2, "floor_only": true, "gy": 0.05},
@@ -62,7 +63,7 @@ var _ghost: Node3D
 var _ghost_mat: StandardMaterial3D
 var _ghost_bad_mat: StandardMaterial3D
 var _ghost_meshes: Array = []
-var _ghost_cell := Vector2i.ZERO
+var _ghost_key: Variant = null
 var _ghost_ok := false
 var _cells := {}
 var _prev_weapon: PackedScene
@@ -82,7 +83,9 @@ func _ready() -> void:
 	_ghost_bad_mat.albedo_color = Color(1, 0.15, 0.1, 0.35)
 	_ghost_bad_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	floor_max_angle = deg_to_rad(55.0)
+	collision_mask = 3
 	equip_weapon(current_weapon)
+	_make_build_grid()
 
 
 func add_weapon(scene: PackedScene, wname: String) -> bool:
@@ -190,20 +193,114 @@ func _update_ghost() -> void:
 		_ghost.visible = false
 		return
 	var hp: Vector3 = hit["position"]
-	var cell := Vector2i(floori(hp.x / GRID), floori(hp.z / GRID))
-	var pos := Vector3(cell.x * GRID + GRID * 0.5, hp.y, cell.y * GRID + GRID * 0.5)
-	if n.y < 0.5:
-		pos.y = hp.y - float(info["h"]) * 0.5
-	else:
-		pos.y = hp.y + float(info["gy"])
 	var yaw := snappedf(cam_yaw, PI / 2.0)
+	var pos: Vector3
+	var key: Variant
+	if _build_piece == "wall":
+		# walls snap onto grid lines and must stay in front of the player
+		var along_x := absf(cos(yaw)) >= absf(sin(yaw))
+		if along_x:
+			var li := _line_ahead(roundi(hp.z / GRID), global_position.z, -cos(yaw))
+			pos = Vector3(floori(hp.x / GRID) * GRID + GRID * 0.5, 0.0, li * GRID)
+			key = Vector3i(0, li, floori(hp.x / GRID))
+		else:
+			var li := _line_ahead(roundi(hp.x / GRID), global_position.x, -sin(yaw))
+			pos = Vector3(li * GRID, 0.0, floori(hp.z / GRID) * GRID + GRID * 0.5)
+			key = Vector3i(1, li, floori(hp.z / GRID))
+	elif _build_piece == "stair":
+		# stairs target the cell you are walking into: the current cell until
+		# you pass the first third of it, then the next cell ahead
+		var cell := _stair_cell()
+		pos = Vector3(cell.x * GRID + GRID * 0.5, 0.0, cell.y * GRID + GRID * 0.5)
+		key = cell
+	else:
+		var cell := Vector2i(floori(hp.x / GRID), floori(hp.z / GRID))
+		pos = Vector3(cell.x * GRID + GRID * 0.5, 0.0, cell.y * GRID + GRID * 0.5)
+		key = cell
+	# every build rests its bottom on whatever is below it
+	var support := _support_height(pos, hp.y)
+	if is_nan(support):
+		_ghost.visible = false
+		return
+	pos.y = support + float(info["gy"])
+	# never allow building behind the player
+	var fwd := -cam.global_transform.basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized()
+	var to := pos - global_position
+	to.y = 0.0
 	_ghost.transform = Transform3D(Basis(Vector3.UP, yaw), pos)
-	_ghost_cell = cell
-	_ghost_ok = not _cells.has(cell)
+	_ghost_key = key
+	_ghost_ok = (to.dot(fwd) > 0.0 or _build_piece == "stair") and not _cells.has(key)
 	var mat := _ghost_mat if _ghost_ok else _ghost_bad_mat
 	for mi in _ghost_meshes:
 		mi.material_override = mat
 	_ghost.visible = true
+
+
+# bumps a grid-line index forward until the line sits ahead of the player
+func _line_ahead(li: int, player_axis: float, fwd_sign: float) -> int:
+	var guard := 0
+	while (li * GRID - player_axis) * fwd_sign <= 0.05 and guard < 20:
+		li += 1 if fwd_sign > 0.0 else -1
+		guard += 1
+	return li
+
+
+func _stair_cell() -> Vector2i:
+	var f := Vector2(-sin(cam_yaw), -cos(cam_yaw))
+	var cell := Vector2i(floori(global_position.x / GRID), floori(global_position.z / GRID))
+	if absf(f.x) >= absf(f.y):
+		var g := global_position.x / GRID
+		var frac := g - floorf(g)
+		var prog := frac if f.x > 0.0 else 1.0 - frac
+		if prog > 1.0 / 3.0:
+			cell.x += 1 if f.x > 0.0 else -1
+	else:
+		var g := global_position.z / GRID
+		var frac := g - floorf(g)
+		var prog := frac if f.y > 0.0 else 1.0 - frac
+		if prog > 1.0 / 3.0:
+			cell.y += 1 if f.y > 0.0 else -1
+	return cell
+
+
+func _support_height(pos: Vector3, ref_y: float) -> float:
+	var q := PhysicsRayQueryParameters3D.create(
+		Vector3(pos.x, ref_y + 8.0, pos.z),
+		Vector3(pos.x, ref_y - 25.0, pos.z))
+	q.collision_mask = 3
+	q.exclude = [get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(q)
+	if hit.is_empty():
+		return NAN
+	return hit["position"].y
+
+
+func _make_build_grid() -> void:
+	var mesh := ImmediateMesh.new()
+	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+	var ext := 96.0
+	var i := -ext
+	while i <= ext:
+		mesh.surface_add_vertex(Vector3(i, 0.03, -ext))
+		mesh.surface_add_vertex(Vector3(i, 0.03, ext))
+		mesh.surface_add_vertex(Vector3(-ext, 0.03, i))
+		mesh.surface_add_vertex(Vector3(ext, 0.03, i))
+		i += GRID
+	mesh.surface_end()
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(1, 1, 1, 0.22)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var mi := MeshInstance3D.new()
+	mi.name = "BuildGrid"
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.material_override = mat
+	mi.mesh = mesh
+	var ps := get_tree().current_scene
+	if ps:
+		ps.add_child.call_deferred(mi)
 
 
 func _place_piece() -> void:
@@ -211,8 +308,33 @@ func _place_piece() -> void:
 		return
 	var p: Node3D = BUILD_PIECES[_build_piece]["s"].instantiate()
 	p.transform = _ghost.transform
+	for c in [p] + p.find_children("*", "CollisionObject3D", true, false):
+		c.collision_layer = 2
+	p.set_meta("build_key", _ghost_key)
+	p.set_meta("build_hp", 2)
 	get_tree().current_scene.add_child(p)
-	_cells[_ghost_cell] = true
+	_cells[_ghost_key] = true
+
+
+func _pickaxe_hit() -> void:
+	var cam := get_viewport().get_camera_3d()
+	if cam == null:
+		return
+	var from := cam.global_position
+	var q := PhysicsRayQueryParameters3D.create(from, from - cam.global_transform.basis.z * 8.0)
+	q.collision_mask = 2
+	var hit := get_world_3d().direct_space_state.intersect_ray(q)
+	if hit.is_empty():
+		return
+	var piece: Object = hit["collider"]
+	if not piece.has_meta("build_key"):
+		return
+	var hp_left := int(piece.get_meta("build_hp", 2)) - 1
+	if hp_left <= 0:
+		_cells.erase(piece.get_meta("build_key"))
+		piece.queue_free()
+	else:
+		piece.set_meta("build_hp", hp_left)
 
 
 func _on_key(k: int) -> void:
@@ -279,6 +401,7 @@ func _instantiate_from_hold(scene: PackedScene) -> Node3D:
 					model = c
 					break
 		if model:
+			model.owner = null
 			model.reparent(_weapon_pivot, false)
 	h.free()
 	if model and scene == PICKAXE:
@@ -436,6 +559,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					_trigger = true
 					_fire_timer = 0.0
 				else:
+					if current_weapon == PICKAXE:
+						_pickaxe_hit()
 					_swing()
 			elif event.button_index == MOUSE_BUTTON_RIGHT and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 				_ads = not _ads
@@ -461,7 +586,7 @@ func _swing() -> void:
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
-		velocity.y += get_gravity().y * delta
+		velocity.y += get_gravity().y * GRAVITY_MULT * delta
 	elif Input.is_action_just_pressed("jump"):
 		velocity.y = JUMP_VELOCITY
 
@@ -471,7 +596,7 @@ func _physics_process(delta: float) -> void:
 
 	var input_dir := Vector2.ZERO if _using_item else Input.get_vector("left", "right", "foward", "backward")
 	var direction := (Basis(Vector3.UP, cam_yaw) * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	var speed := SPEED * (SPRINT_MULT if Input.is_key_pressed(KEY_SHIFT) else 1.0)
+	var speed := SPEED * (SPRINT_MULT if Input.is_action_pressed("sprint") else 1.0)
 	var target := direction * speed
 	velocity.x = move_toward(velocity.x, target.x, ACCEL * delta)
 	velocity.z = move_toward(velocity.z, target.z, ACCEL * delta)

@@ -1,9 +1,9 @@
 [gd_scene load_steps=96 format=3]
 
 [ext_resource type="Script" uid="uid://bqbx6ruje31su" path="res://scripts/player.gd" id="1_3vyb7"]
-[ext_resource type="PackedScene" uid="uid://bajgovx87rwsn" path="res://3dModels/pickaxe.glb" id="2_g2els"]
 
 [ext_resource type="PackedScene" path="res://scenes/weapons/pump_shotgun.tscn" id="wpn"]
+
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_r8uib"]
 radius = 0.35
@@ -238,8 +238,6 @@ mesh = SubResource("hand_mesh")
 [node name="WeaponPivot" type="Node3D" parent="Player/Visual/ArmR" unique_id=900029]
 transform = Transform3D(0.4536, 0.8829, -0.1216, -0.8529, 0.4695, 0.2287, 0.259, 0, 0.966, 0, -0.56, -0.34)
 
-[node name="Pickaxe" parent="Player/Visual/ArmR/WeaponPivot" unique_id=164626318 instance=ExtResource("2_g2els")]
-transform = Transform3D(-1.2239187e-07, 2.8, -4.656612e-10, -2.7999995, -1.2239188e-07, 4.656613e-10, 4.6566126e-10, 4.6566134e-10, 2.7999995, -0.54989386, 0.17554605, 0.030103445)
 
 [node name="PumpShotgun" parent="Player/Visual/ArmR/WeaponPivot" instance=ExtResource("wpn")]
 transform = Transform3D(0, -1.2, 0, 1.2, 0, 0, 0, 0, 1.2, -0.55, 0.18, 0.03)

@@ -1,9 +1,6 @@
-[gd_scene load_steps=96 format=3]
+[gd_scene format=3 uid="uid://bwe2bkdfhjbbu"]
 
 [ext_resource type="Script" uid="uid://bqbx6ruje31su" path="res://scripts/player.gd" id="1_3vyb7"]
-[ext_resource type="PackedScene" uid="uid://bajgovx87rwsn" path="res://3dModels/pickaxe.glb" id="2_g2els"]
-
-[ext_resource type="PackedScene" path="res://scenes/weapons/ar.tscn" id="wpn"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_r8uib"]
 radius = 0.35
@@ -96,10 +93,18 @@ height = 0.14
 radial_segments = 12
 rings = 8
 
+[sub_resource type="BoxMesh" id="BoxMesh_r8uib"]
 
-[node name="ArHold" type="Node3D"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_nbvfj"]
+height = 2.2
 
-[node name="Player" type="CharacterBody3D" unique_id=294265613 parent="."]
+[sub_resource type="BoxMesh" id="BoxMesh_cn70u"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_fnjhh"]
+
+[node name="ArHold" type="Node3D" unique_id=1291019616]
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=294265613]
 script = ExtResource("1_3vyb7")
 
 [node name="CameraPivot" type="Node3D" parent="Player" unique_id=881234567]
@@ -197,7 +202,7 @@ mesh = SubResource("hair_mesh")
 transform = Transform3D(0.4536, 0.8529, -0.259, -0.8829, 0.4695, 0, 0.1216, 0.2287, 0.966, -0.3, 1.52, 0)
 
 [node name="UpperArm" type="MeshInstance3D" parent="Player/Visual/ArmL" unique_id=900020]
-transform = Transform3D(0.9396933, -0.08852135, -0.33036608, -1.1920929e-07, 0.9659259, -0.25881892, 0.3420202, 0.24321029, 0.9076733, 0.08144081, -0.17188793, -0.012922354)
+transform = Transform3D(0.99317914, -0.1009455, 0.08852104, 0.066987224, -0.3325002, -0.96592575, 0.0954428, 1.2838047, -0.24321035, 0.13919327, -0.021781556, -0.17689289)
 material_override = SubResource("mat_jacket")
 mesh = SubResource("upperarm_mesh")
 
@@ -205,12 +210,12 @@ mesh = SubResource("upperarm_mesh")
 transform = Transform3D(1, 0, 0, 0, 0.9397, -0.342, 0, 0.342, 0.9397, 0, -0.3, -0.05)
 
 [node name="Forearm" type="MeshInstance3D" parent="Player/Visual/ArmL/Elbow" unique_id=900022]
-transform = Transform3D(0.70710653, -0.6644628, -0.24184485, -5.9604645e-08, 0.34201998, -0.93969274, 0.7071066, 0.66446286, 0.24184486, 0.1968522, -0.06404106, -0.13144794)
+transform = Transform3D(0.96446145, -0.34332678, -0.008119969, 0.019375162, 0.1317403, -0.9946634, 0.26351088, 1.2469043, 0.10285444, 0.22910985, 0.19604918, -0.5563923)
 material_override = SubResource("mat_jacket")
 mesh = SubResource("forearm_mesh")
 
 [node name="Hand" type="MeshInstance3D" parent="Player/Visual/ArmL/Elbow" unique_id=900023]
-transform = Transform3D(0.99999994, 5.9604645e-08, -6.7055225e-08, 0, 1, -1.7881393e-07, -8.195639e-08, -2.0861626e-07, 0.9999999, 0.30956948, -0.10921392, -0.30587488)
+transform = Transform3D(0.99999994, 5.9604645e-08, -6.7055225e-08, 0, 1, -1.7881393e-07, -8.195639e-08, -2.0861626e-07, 0.9999999, 0.30956954, 0.19078618, -0.8058748)
 material_override = SubResource("mat_skin")
 mesh = SubResource("hand_mesh")
 
@@ -218,7 +223,7 @@ mesh = SubResource("hand_mesh")
 transform = Transform3D(0.4536, -0.8539, 0.259, 0.8829, 0.4695, 0, -0.1216, 0.2297, 0.966, 0.3, 1.52, 0)
 
 [node name="UpperArm" type="MeshInstance3D" parent="Player/Visual/ArmR" unique_id=900025]
-transform = Transform3D(0.99999994, 7.450581e-09, 0, -1.3038516e-08, 0.9659258, -0.25881904, 0, 0.25881904, 0.96592575, -0.083470225, -0.18341362, -0.02231963)
+transform = Transform3D(0.98704726, -0.029231943, 0.15774265, 0.14360625, 0.5993096, -0.7875311, -0.071515515, 0.79998326, 0.59574455, -0.083470225, -0.1834136, -0.022319641)
 material_override = SubResource("mat_jacket")
 mesh = SubResource("upperarm_mesh")
 
@@ -226,20 +231,31 @@ mesh = SubResource("upperarm_mesh")
 transform = Transform3D(1, 0, 0, 0, 0.9397, -0.342, 0, 0.342, 0.9397, 0, -0.3, -0.05)
 
 [node name="Forearm" type="MeshInstance3D" parent="Player/Visual/ArmR/Elbow" unique_id=900027]
-transform = Transform3D(0.87390673, -0.33359715, 0.35355335, 0.17101006, -0.46984634, -0.86602545, 0.45501927, 0.8172868, -0.35355335, 0.0064908266, 0.028184682, -0.13011235)
+transform = Transform3D(0.94883, 0.2870244, 0.015375573, -0.1960171, 0.5700612, -0.7544197, -0.24758457, 0.6486502, 0.6562122, -0.16590136, -0.031248301, -0.1713421)
 material_override = SubResource("mat_jacket")
 mesh = SubResource("forearm_mesh")
 
 [node name="Hand" type="MeshInstance3D" parent="Player/Visual/ArmR/Elbow" unique_id=900028]
-transform = Transform3D(0.9999998, 0, -1.4901161e-08, 4.4703484e-08, 1, -2.9802322e-08, 7.4505806e-08, -2.9802322e-08, 1, 0.08170104, 0.115198374, -0.31104553)
+transform = Transform3D(0.9999998, 0, -1.4901161e-08, 4.4703484e-08, 1, -2.9802322e-08, 7.4505806e-08, -2.9802322e-08, 1, -0.21829891, -0.08480167, -0.31104553)
 material_override = SubResource("mat_skin")
 mesh = SubResource("hand_mesh")
 
-[node name="WeaponPivot" type="Node3D" parent="Player/Visual/ArmR" unique_id=900029]
-transform = Transform3D(0.4536, 0.8829, -0.1216, -0.8529, 0.4695, 0.2287, 0.259, 0, 0.966, 0, -0.56, -0.34)
+[node name="Ar" type="Node3D" parent="." unique_id=1927918985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.3, -2.7000003)
+metadata/_edit_group_ = true
 
-[node name="Pickaxe" parent="Player/Visual/ArmR/WeaponPivot" unique_id=164626318 instance=ExtResource("2_g2els")]
-transform = Transform3D(-1.2239187e-07, 2.8, -4.656612e-10, -2.7999995, -1.2239188e-07, 4.656613e-10, 4.6566126e-10, 4.6566134e-10, 2.7999995, -0.54989386, 0.17554605, 0.030103445)
+[node name="body" type="MeshInstance3D" parent="Ar" unique_id=254727154]
+transform = Transform3D(0.15399994, 0, 0, 0, 0.14819995, 0, 0, 0, 0.92160004, 0, 0, 2.17648)
+mesh = SubResource("BoxMesh_r8uib")
 
-[node name="AR" parent="Player/Visual/ArmR/WeaponPivot" instance=ExtResource("wpn")]
-transform = Transform3D(0, -1.2, 0, 1.2, 0, 0, 0, 0, 1.2, -0.55, 0.18, 0.03)
+[node name="barrel" type="MeshInstance3D" parent="Ar" unique_id=200879079]
+transform = Transform3D(0.06317997, 0, 0, 0, 6.0400374e-09, 0.05807996, 0, 0.13817994, -2.5387559e-09, 0, 0, 1.5803558)
+mesh = SubResource("CylinderMesh_nbvfj")
+
+[node name="grip" type="MeshInstance3D" parent="Ar" unique_id=1705585342]
+transform = Transform3D(0, -0.14000002, 0, -0.16639994, 0, 0, 0, 0, 0.14850001, 0, -0.15008003, 2.2227502)
+mesh = SubResource("BoxMesh_cn70u")
+
+[node name="aimthing" type="MeshInstance3D" parent="Ar" unique_id=720762310]
+transform = Transform3D(0.07999999, 0, 0, 0, 0.16199994, 0, 0, 0, 0.099999964, -3.6507845e-07, 0.0838, 1.7699999)
+mesh = SubResource("PrismMesh_fnjhh")

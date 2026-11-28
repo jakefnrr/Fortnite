@@ -228,3 +228,6 @@ mesh = SubResource("forearm_mesh")
 transform = Transform3D(0.9999998, 0, -1.4901161e-08, 4.4703484e-08, 1, -2.9802322e-08, 7.4505806e-08, -2.9802322e-08, 1, 0.08170104, 0.115198374, -0.31104553)
 material_override = SubResource("mat_skin")
 mesh = SubResource("hand_mesh")
+
+[node name="WeaponPivot" type="Node3D" parent="Visual/ArmR" unique_id=900029]
+transform = Transform3D(0.4536, 0.8829, -0.1216, -0.8529, 0.4695, 0.2287, 0.259, 0, 0.966, 0, -0.56, -0.34)

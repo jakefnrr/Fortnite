@@ -1,8 +1,6 @@
-[gd_scene load_steps=95 format=3]
+[gd_scene format=3 uid="uid://fluu8l72pbg4"]
 
 [ext_resource type="Script" uid="uid://bqbx6ruje31su" path="res://scripts/player.gd" id="1_3vyb7"]
-
-[ext_resource type="PackedScene" path="res://scenes/build/blueprint.tscn" id="wpn"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_r8uib"]
 radius = 0.35
@@ -95,10 +93,31 @@ height = 0.14
 radial_segments = 12
 rings = 8
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nmxdt"]
+albedo_color = Color(0.1967093, 0.30668798, 0.8231233, 1)
 
-[node name="BlueprintHold" type="Node3D"]
+[sub_resource type="BoxMesh" id="BoxMesh_r8uib"]
+material = SubResource("StandardMaterial3D_nmxdt")
 
-[node name="Player" type="CharacterBody3D" unique_id=294265613 parent="."]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nbvfj"]
+albedo_color = Color(0.93381953, 0.6813833, 0.37297446, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_r8uib"]
+material = SubResource("StandardMaterial3D_nbvfj")
+top_radius = 0.02
+bottom_radius = 0.02
+height = 0.1
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_nbvfj"]
+top_radius = 0.001
+bottom_radius = 0.022
+height = 0.02
+radial_segments = 8
+
+[node name="BlueprintHold" type="Node3D" unique_id=663926573]
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=294265613]
 script = ExtResource("1_3vyb7")
 
 [node name="CameraPivot" type="Node3D" parent="Player" unique_id=881234567]
@@ -196,7 +215,7 @@ mesh = SubResource("hair_mesh")
 transform = Transform3D(0.4536, 0.8529, -0.259, -0.8829, 0.4695, 0, 0.1216, 0.2287, 0.966, -0.3, 1.52, 0)
 
 [node name="UpperArm" type="MeshInstance3D" parent="Player/Visual/ArmL" unique_id=900020]
-transform = Transform3D(0.9396933, -0.08852135, -0.33036608, -1.1920929e-07, 0.9659259, -0.25881892, 0.3420202, 0.24321029, 0.9076733, 0.08144081, -0.17188793, -0.012922354)
+transform = Transform3D(0.85204417, 0.16481112, -0.49685016, -0.51707906, 0.41286534, -0.74978095, 0.08155956, 0.8957565, 0.43699926, 0.06928408, -0.19474983, -0.10949918)
 material_override = SubResource("mat_jacket")
 mesh = SubResource("upperarm_mesh")
 
@@ -204,12 +223,12 @@ mesh = SubResource("upperarm_mesh")
 transform = Transform3D(1, 0, 0, 0, 0.9397, -0.342, 0, 0.342, 0.9397, 0, -0.3, -0.05)
 
 [node name="Forearm" type="MeshInstance3D" parent="Player/Visual/ArmL/Elbow" unique_id=900022]
-transform = Transform3D(0.70710653, -0.6644628, -0.24184485, -5.9604645e-08, 0.34201998, -0.93969274, 0.7071066, 0.66446286, 0.24184486, 0.1968522, -0.06404106, -0.13144794)
+transform = Transform3D(0.85344005, -0.1776839, -0.48996723, -0.50364137, -0.039264947, -0.86302006, 0.13410635, 0.98330367, -0.122998595, 0.14174545, -0.00315848, -0.2839392)
 material_override = SubResource("mat_jacket")
 mesh = SubResource("forearm_mesh")
 
 [node name="Hand" type="MeshInstance3D" parent="Player/Visual/ArmL/Elbow" unique_id=900023]
-transform = Transform3D(0.99999994, 5.9604645e-08, -6.7055225e-08, 0, 1, -1.7881393e-07, -8.195639e-08, -2.0861626e-07, 0.9999999, 0.30956948, -0.10921392, -0.30587488)
+transform = Transform3D(0.9999998, 1.1920929e-07, -1.1175871e-07, -2.9802322e-08, 1, -3.2782555e-07, -2.6077032e-07, -7.4505806e-07, 0.9999998, 0.16616988, -0.0042072833, -0.47442758)
 material_override = SubResource("mat_skin")
 mesh = SubResource("hand_mesh")
 
@@ -234,5 +253,20 @@ transform = Transform3D(0.9999998, 0, -1.4901161e-08, 4.4703484e-08, 1, -2.98023
 material_override = SubResource("mat_skin")
 mesh = SubResource("hand_mesh")
 
-[node name="Blueprint" parent="Player/Visual/ArmR/WeaponPivot" instance=ExtResource("wpn")]
-transform = Transform3D(0, -1.2, 0, 1.2, 0, 0, 0, 0, 1.2, -0.55, 0.18, 0.03)
+[node name="WeaponPivot" type="Node3D" parent="Player/Visual/ArmR" unique_id=900029]
+transform = Transform3D(0.4536, 0.8829, -0.1216, -0.8529, 0.4695, 0.2287, 0.259, 0, 0.966, 0, -0.56, -0.34)
+
+[node name="Blueprint" type="Node3D" parent="Player/Visual/ArmR/WeaponPivot" unique_id=1312211291]
+
+[node name="blueprintpaper" type="MeshInstance3D" parent="Player/Visual/ArmR/WeaponPivot/Blueprint" unique_id=1044405138]
+transform = Transform3D(-2.9158226e-05, 1.9016134e-05, -0.35959542, -0.16971771, 0.028285502, 1.687793e-05, 0.16970704, 0.028257197, -0.00031447638, -0.88907427, 0.1429706, -0.04375419)
+mesh = SubResource("BoxMesh_r8uib")
+
+[node name="blueprintpencil" type="MeshInstance3D" parent="Player/Visual/ArmR/WeaponPivot/Blueprint" unique_id=599037606]
+transform = Transform3D(0.5391198, -1.7898656, 0.9058601, -1.3232003, -1.4621676, -2.9650966e-05, 0.5410043, -1.7908212, -0.9058838, -0.38950163, 0.34295574, 0.15649109)
+mesh = SubResource("CylinderMesh_r8uib")
+metadata/_edit_group_ = true
+
+[node name="penciltip" type="MeshInstance3D" parent="Player/Visual/ArmR/WeaponPivot/Blueprint/blueprintpencil" unique_id=508627685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05555556, 0)
+mesh = SubResource("CylinderMesh_nbvfj")
